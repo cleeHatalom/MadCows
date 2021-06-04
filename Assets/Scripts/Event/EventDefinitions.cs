@@ -38,9 +38,9 @@ namespace EventDefinitions
         }
     }
     
-    public class LoadLevelEvent : UnityEvent<int, int, int> { }
+    public class LoadLevelEvent : UnityEvent<LevelsData.LevelData> { }
 
-    public class LoadLevelEventArgs : BaseEventArgs<int, int, int>
+    public class LoadLevelEventArgs : BaseEventArgs<LevelsData.LevelData>
     {
         public LoadLevelEventArgs()
         {

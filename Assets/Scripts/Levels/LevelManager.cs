@@ -22,7 +22,7 @@ public class LevelManager : MonoBehaviour
             }
 
             var loadedData = JsonUtility.FromJson<LevelsData>(jsonFile.text);
-            _levelsData = loadedData.levels.ToDictionary(level => level.number, level => level);
+            _levelsData = loadedData.LevelDataDictionary;
         }
 
         Debug.Log(_levelsData.Count + " levels have been stored in the dictionary!");
@@ -33,9 +33,7 @@ public class LevelManager : MonoBehaviour
     public void DispatchLoadLevelEvent(int level)
     {
         LoadLevelEventArgs args = new LoadLevelEventArgs();
-        args.param0 = 11 * 11;
-        args.param1 = _levelsData[level].path.First();
-        args.param2 = _levelsData[level].path.Last();
+        args.param0 = _levelsData[level];
 
         PersistentGameManager.Instance.EventHub.RaiseEvent(args);
     }

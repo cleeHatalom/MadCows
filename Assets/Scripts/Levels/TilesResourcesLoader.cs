@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,5 +20,10 @@ public static class TilesResourcesLoader
     private static Tile GetTileByName(string name)
     {
         return (Tile)Resources.Load(name, typeof(Tile));
+    }
+
+    public static TileBase GetBaseTile()
+    {
+        return GetTileByName(BaseGrass);
     }
 }

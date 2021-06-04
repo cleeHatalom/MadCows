@@ -2,15 +2,37 @@
   "levels": [
     {
       "number": 1,
-      "path": [22,32]
+      "path": [22,32],
+	  "maxY": 32,
+	  "maxX": 24,
+	  "specialTiles" :
+	  [
+		  {
+			"rootLocation":
+			{
+				"x":3,
+				"y":7
+			},
+			"sizeVector":
+			{
+				"x":3,
+				"y":3
+			},
+			"tileType":""
+		  }
+	  ]
     },
     {
       "number": 2,
-      "path": [55,65]
+      "path": [55,65],
+	  "rows": 20,
+	  "cols": 12
     },
     {
       "number": 3,
-      "path": [88,98]
+      "path": [88,98],
+	  "rows": 20,
+	  "cols": 12
     }
   ]
 }
