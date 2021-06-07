@@ -1,19 +1,28 @@
-using System.Collections;
-using System.Collections.Generic;
+/* 
+ * Copyright 2021 (C) Hatalom Corporation - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ */
+
 using UnityEngine;
 
-public abstract class EventSubscriber
+public interface IEventSubscriber
+{ 
+    void Register();
+    void Unregister();
+}
+
+public abstract class SubscriberMonoBehaviour : MonoBehaviour, IEventSubscriber
 {
-    public EventSubscriber()
+    void Start()
     {
         Register();
     }
 
-    ~EventSubscriber()
+    void OnDestroy()
     {
         Unregister();
     }
-
-    protected abstract void Register();
-    protected abstract void Unregister();
+    public abstract void Register();
+    public abstract void Unregister();
 }

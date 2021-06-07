@@ -11,28 +11,54 @@ public class TestCharacter : MonoBehaviour
     bool shouldFollow;
     [SerializeField]
     Vector3 targetLoc;
+
+    [SerializeField]
+    Vector3 previousLoc;
+
+    List<Vector2Int> path;
+
     // Start is called before the first frame update
     void Start()
     {
-        PersistentGameManager.Instance.EventHub.AddListener<string>("OnCharacterSelected", HandleCharacterSelection);
-        PersistentGameManager.Instance.EventHub.AddListener<Vector2>("MapTargetSet", TrackNewLocation);
+        PersistentGameManager.Instance.EventHub.AddListener<OnCharacterClickedEvent, string>(HandleCharacterClicked);
+        PersistentGameManager.Instance.EventHub.AddListener<PollCharacterPositionEvent, string>(BroadcastLocation);
+        //PersistentGameManager.Instance.EventHub.AddListener<Vector2>("MapTargetSet", TrackNewLocation);
         animator = GetComponent<Animator>();
         shouldFollow = false;
     }
 
-    public void HandleCharacterSelection(string name)
+    public void HandleCharacterClicked(string name)
     {
-        Debug.Log("Clicked on " + name);
         if(name == this.name)
         {
-            animator.SetTrigger("ClickedOn");
+            Debug.Log("Clicked on " + name);
             shouldFollow = !shouldFollow;
-        }
 
+            OnCharacterSelectedEventArgs args = new OnCharacterSelectedEventArgs();
+            if (shouldFollow)
+            {
+                args.param0 = name;
+            }
+            else
+            {
+                args.param0 = "";
+            }
+            PersistentGameManager.Instance.EventHub.RaiseEvent(args);
+            animator.SetBool("IsActive", shouldFollow);
+        }
+    }
+    public void BroadcastLocation(string name)
+    {
+        if(name == this.name)
+        {
+            BroadcastCharacterPositionEventArgs args = new BroadcastCharacterPositionEventArgs();
+            args.param0 = new Vector2Int((int)previousLoc.x, (int)previousLoc.y) ;
+        }
     }
 
     public void TrackNewLocation(Vector2 newLoc)
     {
+        previousLoc = targetLoc;
         targetLoc = new Vector3(newLoc.x, newLoc.y, 0);
     }
 

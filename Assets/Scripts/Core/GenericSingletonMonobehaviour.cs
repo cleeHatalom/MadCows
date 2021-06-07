@@ -35,4 +35,13 @@ public class GenericSingletonMonobehaviour<T> : MonoBehaviour where T : Componen
             Destroy(gameObject);
         }
     }
+
+    public virtual void OnDestroy()
+    {
+        if(instance!=null)
+        {
+            Destroy(instance);
+            instance = null;
+        }
+    }
 }

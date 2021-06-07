@@ -1,3 +1,9 @@
+/* 
+ * Copyright 2021 (C) Hatalom Corporation - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ */
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,71 +24,65 @@ public class LevelsData
         public int maxX;
         public int maxY;
 
-        public LevelGridLine[] filledLines;
-        public SpecialTile[] specialTiles;
+        public SerializableTileData[] tileData;
+        public SerializableTileDataGroup[] tileBlockData;
 
-        public bool isInitialized = false;
-
-        private Dictionary<int, HashSet<int>> filledGridLineDict;
-        public Dictionary<int, HashSet<int>> FilledGridLines
+        private Dictionary<int, SerializableTileData> tilesDict;
+        public Dictionary<int, SerializableTileData> SerializedTiles
         {
+            /**
+             * Optimization considerations:
+             * - 
+             */
             get
             {
-                if (filledGridLineDict == null)
+                if (tilesDict == null)
                 {
-                    filledGridLineDict = new Dictionary<int, HashSet<int>>();
+                    tilesDict = new Dictionary<int, SerializableTileData>();
 
-                    if (filledLines != null)
+                    if(tileData != null)
                     {
-                        filledGridLineDict = filledLines.ToDictionary(line => line.row, line => new HashSet<int>(line.blankCol));
+                        tilesDict = tileData.ToDictionary(tile => ConvertCoordToIndex(tile.rootLocation.x, tile.rootLocation.y, maxX), tile=>tile);
                     }
-                }
-                return filledGridLineDict;
-            }
-        }
-
-        private Dictionary<int, string> specialTilesDict;
-        public Dictionary<int, string> SpecialTiles
-        {
-            get
-            {
-                if (specialTilesDict == null)
-                {
-                    specialTilesDict = new Dictionary<int, string>();
-
-                    if (specialTiles != null)
+                    #region Temporary Deserialization for Tile Data Groups (See <summary> above class for more)
+                    if (tileBlockData != null)
                     {
-                        foreach (SpecialTile tile in specialTiles)
+                        foreach (SerializableTileDataGroup tileBlock in tileBlockData)
                         {
-                            for (int i = 0; i < tile.sizeVector.y; ++i)
+                            for (int i = 0; i < tileBlock.sizeVector.y; ++i)
                             {
-                                for (int j = 0; j < tile.sizeVector.x; ++j)
+                                for (int j = 0; j < tileBlock.sizeVector.x; ++j)
                                 {
-                                    specialTilesDict.Add(ConvertCoordToIndex(tile.rootLocation.x + j, tile.rootLocation.y + i, maxX), tile.tileType);
+                                    int index = ConvertCoordToIndex(tileBlock.rootLocation.x + j, tileBlock.rootLocation.y + i, maxX);
+                                    if (!tilesDict.ContainsKey(index))
+                                    {
+                                        tilesDict.Add(index, tileBlock);
+                                    }
+                                    else //TODO: Determine What can overwrite what
+                                    {
+                                        tilesDict[index] = tileBlock;
+                                    }
                                 }
                             }
                         }
                     }
+                    #endregion
                 }
-                return specialTilesDict;
+                return tilesDict;
             }
         }
 
-        public bool CheckIsFilledIn(int line, int column)
+        public string GetTileFill(int x, int y)
         {
-            bool result = true;
+            string fillType ="";
 
-            if (FilledGridLines.ContainsKey(line))  //if no filled lines are specified, short circuit to the default result.
+            SerializableTileData tile;
+            if (SerializedTiles.TryGetValue(ConvertCoordToIndex(x, y, maxX), out tile))
             {
-                result = FilledGridLines[line].Contains(column);
+                fillType = tile.tileType;
             }
 
-            return result;
-        }
-
-        public bool IsSpecialTile(int x, int y)
-        {
-            return SpecialTiles.ContainsKey(ConvertCoordToIndex(x, y, maxX));
+            return fillType;
         }
     }
 
@@ -104,7 +104,7 @@ public class LevelsData
     public class LevelGridLine
     {
         public int row;
-        public int[] blankCol;
+        public int[] blankCol; //Elevation will 
     }
 
     [Serializable]
@@ -115,11 +115,22 @@ public class LevelsData
     }
 
     [Serializable]
-    public class SpecialTile
+    public class SerializableTileData
     {
         public SerializableVector2 rootLocation;
-        public SerializableVector2 sizeVector;
+        public int elevation;                       //may consider this 
         public string tileType;
+        public bool canTraverse;
+    }
+
+    /// <summary>
+    /// This is a testing class for JSON serialization. Will be removed eventually once
+    /// a usable Stage Creator Tool is created.
+    /// </summary>
+    [Serializable]
+    public class SerializableTileDataGroup : SerializableTileData
+    {
+        public SerializableVector2 sizeVector;
     }
 
     public static int ConvertCoordToIndex(int x, int y, int maxX)

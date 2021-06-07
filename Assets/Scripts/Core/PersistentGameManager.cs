@@ -1,3 +1,9 @@
+/* 
+ * Copyright 2021 (C) Hatalom Corporation - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ */
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;

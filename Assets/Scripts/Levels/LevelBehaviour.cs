@@ -1,16 +1,19 @@
+/* 
+ * Copyright 2021 (C) Hatalom Corporation - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ */
+
+using EventDefinitions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class LevelBehaviour : MonoBehaviour
+public class LevelBehaviour : SubscriberMonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        PersistentGameManager.Instance.EventHub.AddListener<LevelsData.LevelData> ("LoadLevel", SetupTiles);
-    }
+    private Dictionary<string, IEnumerator> navPathProcesses = new Dictionary<string, IEnumerator>();
 
     private void SetupTiles(LevelsData.LevelData levelData)
     {
@@ -24,20 +27,21 @@ public class LevelBehaviour : MonoBehaviour
 
         //foreach(string s in levelData.SpecialTiles.Values)
         {
-            //Debug.Log(s);
+            Debug.Log("Number of Serialized Tiles read: " + levelData.SerializedTiles.Count);
         }
 
         for (int h = 0; h < levelData.maxY; h++) 
         {
             for (int w = 0; w < levelData.maxX; w++)
             {
-                if (levelData.IsSpecialTile(w, h))
+                string tileToSet = levelData.GetTileFill(w, h);
+                if (tileToSet != "")
                 {
-                    Debug.Log("Special Tile Detected at (" + w + ", " + h + ")");
+                    baseTilemap.SetTile(currentCellPosition, TilesResourcesLoader.GetTileByName(tileToSet));
                 }
                 else
                 {
-                    baseTilemap.SetTile(currentCellPosition, TilesResourcesLoader.GetBaseTile());
+                    baseTilemap.SetTile(currentCellPosition, TilesResourcesLoader.GetBaseRuleTile());
                 }
                 currentCellPosition.x = (int)Math.Ceiling(cellSize.x + currentCellPosition.x);
             }
@@ -47,22 +51,59 @@ public class LevelBehaviour : MonoBehaviour
         }
 
         baseTilemap.CompressBounds();
-        /*
-        var localTilesPositions = new List<Vector3Int>(FieldTotalTiles);
-        foreach (var pos in baseLevel.cellBounds.allPositionsWithin)
-        {
-            Vector3Int localPlace = new Vector3Int(pos.x, pos.y, pos.z);
-            localTilesPositions.Add(localPlace);
-        }
 
-        var pathHorizontalTile = TilesResourcesLoader.GetPathHorizontalTile();
-        foreach (var localPosition in localTilesPositions.GetRange(first, Math.Abs(first - last)))
+    }
+
+    public void GeneratePath(Vector2 newPosition)
+    {
+        //Debug.Log("New Position: " + newPosition);
+        gameObject.transform.position = new Vector3(newPosition.x, newPosition.y, transform.position.z);
+
+
+        MapTargetSetEventArgs args = new MapTargetSetEventArgs();
+        args.param0 = newPosition;
+
+        PersistentGameManager.Instance.EventHub.RaiseEvent(args);
+    }
+    public void SelectCharacterDestination(Vector2 newPosition)
+    {
+        //Debug.Log("New Position: " + newPosition);
+        gameObject.transform.position = new Vector3(newPosition.x, newPosition.y, transform.position.z);
+
+
+        MapTargetSetEventArgs args = new MapTargetSetEventArgs();
+        args.param0 = newPosition;
+
+        PersistentGameManager.Instance.EventHub.RaiseEvent(args);
+    }
+
+    private void PollSelectedCharacterPosition(string characterName)
+    {
+        if(characterName != "")
         {
-            baseLevel.SetTile(localPosition, pathHorizontalTile);
+
         }
-        var startStopTile = TilesResourcesLoader.GetStartStopTile();
-        baseLevel.SetTile(localTilesPositions[first], startStopTile);
-        baseLevel.SetTile(localTilesPositions[last], startStopTile);
-        */
+    }
+
+    private IEnumerator CreateNavPath(string characterName, Vector2Int start, Vector2Int end)
+    {
+
+
+        yield return null;
+    }
+
+    public override void Register()
+    {
+        PersistentGameManager.Instance.EventHub.AddListener<LoadLevelEvent, LevelsData.LevelData>(SetupTiles);
+        PersistentGameManager.Instance.EventHub.AddListener<OnScreenClickedEvent, Vector2>(SelectCharacterDestination);
+        PersistentGameManager.Instance.EventHub.AddListener<OnCharacterSelectedEvent, string>(PollSelectedCharacterPosition);
+
+    }
+
+    public override void Unregister()
+    {
+        PersistentGameManager.Instance.EventHub.RemoveListener<LoadLevelEvent, LevelsData.LevelData>(SetupTiles);
+        PersistentGameManager.Instance.EventHub.RemoveListener<OnScreenClickedEvent, Vector2>(SelectCharacterDestination);
+        PersistentGameManager.Instance.EventHub.RemoveListener<OnCharacterSelectedEvent, string>(PollSelectedCharacterPosition);
     }
 }

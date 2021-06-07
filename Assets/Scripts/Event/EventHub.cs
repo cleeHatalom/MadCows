@@ -1,244 +1,243 @@
+/* 
+ * Copyright 2021 (C) Hatalom Corporation - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ */
 
 using System;
-using System.IO;
-using System.Xml;
-using System.Xml.Serialization;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using EventDefinitions;
 
-public abstract class BaseEventArgs : EventArgs
+#region Event Args Definitions
+
+public abstract class BaseEventArgs<EventT, ParamT0> : EventArgs where EventT : UnityEventBase
 {
-    public string EventName { get; protected set; }
+    public ParamT0 param0 { get; set; }
 }
 
-public abstract class BaseEventArgs<T0> : BaseEventArgs
+public abstract class BaseEventArgs<EventT, ParamT0, ParamT1> : EventArgs where EventT : UnityEventBase
 {
-    public T0 param0 { get; set; }
+    public ParamT0 param0 { get; set; }
+    public ParamT1 param1 { get; set; }
 }
 
-public abstract class BaseEventArgs<T0, T1> : BaseEventArgs<T0>
+public abstract class BaseEventArgs<EventT, ParamT0, ParamT1, ParamT2> : EventArgs where EventT : UnityEventBase
 {
-    public T1 param1 { get; set; }
+    public ParamT0 param0 { get; set; }
+    public ParamT1 param1 { get; set; }
+    public ParamT2 param2 { get; set; }
 }
 
-public abstract class BaseEventArgs<T0, T1, T2> : BaseEventArgs<T0, T1>
+public abstract class BaseEventArgs<EventT, ParamT0, ParamT1, ParamT2, ParamT3> : EventArgs where EventT : UnityEventBase
 {
-    public T2 param2 { get; set; }
+    public ParamT0 param0 { get; set; }
+    public ParamT1 param1 { get; set; }
+    public ParamT2 param2 { get; set; }
+    public ParamT3 param3 { get; set; }
 }
+#endregion
 
-public abstract class BaseEventArgs<T0, T1, T2, T3> : BaseEventArgs<T0, T1, T2>
-{
-    public T3 param3 { get; set; }
-}
 
 public class EventHub
 {
-    private Dictionary<string, UnityEventBase> events = new Dictionary<string, UnityEventBase>();
+    private Dictionary<Type, UnityEventBase> events = new Dictionary<Type, UnityEventBase>();
 
     public EventHub()
     {
-        #region Shelved XML reading Implemenation <Revisit Later>
-        /*
-        //deserialize XML file
-        XmlSerializer serializer = new XmlSerializer(typeof(SerializedEvents));
-        string filename = "";
-        /*
-        eventsNoParam = new Dictionary<string, UnityEventBase>();
-        eventsOneParam = new Dictionary<string, UnityEventBase>();
-        eventsTwoParam = new Dictionary<string, UnityEventBase>();
-        eventsThreeParam = new Dictionary<string, UnityEventBase>();
-        eventsFourParam = new Dictionary<string, UnityEventBase>();
-        
-        #region Event Serialization
-        SerializedEvents serializedEvents;
-        using (Stream reader = new FileStream(filename, FileMode.Open))
-        {
-            // Call the Deserialize method to restore the object's state.
-            serializedEvents = (SerializedEvents)serializer.Deserialize(reader);
+        #region Dictonary Population
 
-            Dictionary<string, UnityEventBase>[] dictionaries = { eventsNoParam, eventsOneParam, eventsTwoParam, eventsThreeParam, eventsFourParam };
-
-            foreach(SerializableEvent se in serializedEvents.events)
-            {
-                if(se.parameters.Count < dictionaries.Length)
-                {
-                    //UnityEventBase addedEvent;
-                    Type[] types = new Type[se.parameters.Count];
-                    for(int i =0; i < se.parameters.Count; ++i)
-                    {
-                        types[i] = Type.GetType(se.parameters[i]);
-
-                        if(types[i] == null)
-                        {
-                            //throw message
-                        }
-                    }
-
-                }
-            }
-        }
-        */
-        #endregion
-
-        #region Manual Event Creation / Registration
-
-        events.Add("OnScreenClicked", new OnScreenClickedEvent());
-        events.Add("MapTargetSet", new MapTargetSetEvent());
-        events.Add("OnCharacterSelected", new OnCharacterSelectedEvent());
-        events.Add("LoadLevel", new LoadLevelEvent());
+        //events.Add(typeof(OnScreenClickedEvent), new OnScreenClickedEvent());
+        //events.Add(typeof(MapTargetSetEvent), new MapTargetSetEvent());
+        //events.Add(typeof(OnCharacterSelectedEvent), new OnCharacterSelectedEvent());
+        //events.Add(typeof(LoadLevelEvent), new LoadLevelEvent());
 
         #endregion
     }
 
-    public void RaiseEvent(BaseEventArgs args)
+    #region Raising Events
+    public void RaiseEvent<EventT>() where EventT : UnityEvent
     {
         UnityEventBase invokedEvent;
-        if(events.TryGetValue(args.EventName, out invokedEvent))
+        if(events.TryGetValue(typeof(EventT), out invokedEvent))
         {
             ((UnityEvent)invokedEvent).Invoke();
         }
         else
         {
-            Debug.LogError(args.EventName + " not added");
+            Debug.LogError(typeof(EventT).Name + " not added");
         }
     }
     
-    public void RaiseEvent<T0>(BaseEventArgs<T0> args)
+    public void RaiseEvent<EventT, T0>(BaseEventArgs<EventT, T0> args) where EventT : UnityEvent<T0>
     {
         UnityEventBase invokedEvent;
-        if (events.TryGetValue(args.EventName, out invokedEvent))
+        if (events.TryGetValue(typeof(EventT), out invokedEvent))
         {
             ((UnityEvent<T0>)invokedEvent).Invoke(args.param0);
         }
         else
         {
-            Debug.LogError(args.EventName + " not added");
+            Debug.LogError(typeof(EventT).Name + " not added");
         }
     }
 
-    public void RaiseEvent<T0, T1>(BaseEventArgs<T0, T1> args)
+    public void RaiseEvent<EventT, T0, T1>(BaseEventArgs<EventT, T0, T1> args) where EventT : UnityEvent<T0, T1>
     {
         UnityEventBase invokedEvent;
-        if (events.TryGetValue(args.EventName, out invokedEvent))
+        if (events.TryGetValue(typeof(EventT), out invokedEvent))
         {
             ((UnityEvent<T0, T1>)invokedEvent).Invoke(args.param0, args.param1);
         }
         else
         {
-            Debug.LogError(args.EventName + " not added");
+            Debug.LogError(typeof(EventT).Name + " not added");
         }
     }
 
-    public void RaiseEvent<T0, T1, T2>(BaseEventArgs<T0, T1, T2> args)
+    public void RaiseEvent<EventT, T0, T1, T2>(BaseEventArgs<EventT, T0, T1, T2> args) where EventT : UnityEvent<T0, T1, T2>
     {
         UnityEventBase invokedEvent;
-        if (events.TryGetValue(args.EventName, out invokedEvent))
+        if (events.TryGetValue(typeof(EventT), out invokedEvent))
         {
             ((UnityEvent<T0, T1, T2>)invokedEvent).Invoke(args.param0, args.param1, args.param2);
         }
         else
         {
-            Debug.LogError(args.EventName + " not added");
+            Debug.LogError(typeof(EventT).Name + " not added");
         }
     }
 
-    public void RaiseEvent<T0, T1, T2, T3>(BaseEventArgs<T0, T1, T2, T3> args)
+    public void RaiseEvent<EventT, T0, T1, T2, T3>(BaseEventArgs<EventT, T0, T1, T2, T3> args) where EventT : UnityEvent<T0, T1, T2, T3>
     {
         UnityEventBase invokedEvent;
-        if (events.TryGetValue(args.EventName, out invokedEvent))
+        if (events.TryGetValue(typeof(EventT), out invokedEvent))
         {
             ((UnityEvent<T0, T1, T2, T3>)invokedEvent).Invoke(args.param0, args.param1, args.param2, args.param3);
         }
         else
         {
-            Debug.LogError(args.EventName + " not added");
-        }
-    }
-
-    #region Adding Listeners
-    public void AddListener(string name, UnityAction action)
-    {
-        if (events.ContainsKey(name))
-        {
-            UnityEvent listeningEvent = (UnityEvent)events[name];
-            listeningEvent.AddListener(action);
-        }
-    }
-    public void AddListener<T0>(string name, UnityAction<T0> action)
-    {
-        if (events.ContainsKey(name))
-        {
-            UnityEvent<T0> listeningEvent = (UnityEvent<T0>)events[name];
-            listeningEvent.AddListener(action);
-        }
-    }
-    public void AddListener<T0, T1>(string name, UnityAction<T0, T1> action)
-    {
-        if (events.ContainsKey(name))
-        {
-            UnityEvent<T0, T1> listeningEvent = (UnityEvent<T0, T1>)events[name];
-            listeningEvent.AddListener(action);
-        }
-    }
-    public void AddListener<T0, T1, T2>(string name, UnityAction<T0, T1, T2> action)
-    {
-        if (events.ContainsKey(name))
-        {
-            UnityEvent<T0, T1, T2> listeningEvent = (UnityEvent<T0, T1, T2>)events[name];
-            listeningEvent.AddListener(action);
-        }
-    }
-    public void AddListener<T0, T1, T2, T3>(string name, UnityAction<T0, T1, T2, T3> action)
-    {
-        if(events.ContainsKey(name))
-        {
-            UnityEvent<T0, T1, T2, T3> listeningEvent = (UnityEvent<T0, T1, T2, T3>)events[name];
-            listeningEvent.AddListener(action);
+            Debug.LogError(typeof(EventT).Name + " not added");
         }
     }
     #endregion
 
+    #region Adding Listeners
+    public void AddListener<EventT>(UnityAction action) where EventT : UnityEvent
+    {
+        EventT listeningEvent;
+        if (events.ContainsKey(typeof(EventT)))
+        {
+            listeningEvent = (EventT)events[typeof(EventT)];
+        }
+        else
+        {
+            listeningEvent = (EventT)Activator.CreateInstance(typeof(EventT));
+            events.Add(typeof(EventT), listeningEvent);
+        }
+        listeningEvent.AddListener(action);
+    }
+
+    public void AddListener<EventT, T0>(UnityAction<T0> action) where EventT : UnityEvent<T0>
+    {
+        EventT listeningEvent;
+        if (events.ContainsKey(typeof(EventT)))
+        {
+            listeningEvent = (EventT)events[typeof(EventT)];
+        }
+        else
+        {
+            listeningEvent = (EventT)Activator.CreateInstance(typeof(EventT));
+            events.Add(typeof(EventT), listeningEvent);
+        }
+        listeningEvent.AddListener(action);
+    }
+
+    public void AddListener<EventT, T0, T1>(UnityAction<T0, T1> action) where EventT : UnityEvent<T0, T1>
+    {
+        EventT listeningEvent;
+        if (events.ContainsKey(typeof(EventT)))
+        {
+            listeningEvent = (EventT)events[typeof(EventT)];
+        }
+        else
+        {
+            listeningEvent = (EventT)Activator.CreateInstance(typeof(EventT));
+            events.Add(typeof(EventT), listeningEvent);
+        }
+        listeningEvent.AddListener(action);
+    }
+
+    public void AddListener<EventT, T0, T1, T2>(UnityAction<T0, T1, T2> action) where EventT : UnityEvent<T0, T1, T2>
+    {
+        EventT listeningEvent;
+        if (events.ContainsKey(typeof(EventT)))
+        {
+            listeningEvent = (EventT)events[typeof(EventT)];
+        }
+        else
+        {
+            listeningEvent = (EventT)Activator.CreateInstance(typeof(EventT));
+            events.Add(typeof(EventT), listeningEvent);
+        }
+        listeningEvent.AddListener(action);
+    }
+
+    public void AddListener<EventT, T0, T1, T2, T3>(UnityAction<T0, T1, T2, T3> action) where EventT : UnityEvent<T0, T1, T2, T3>
+    {
+        EventT listeningEvent;
+        if (events.ContainsKey(typeof(EventT)))
+        {
+            listeningEvent = (EventT)events[typeof(EventT)];
+        }
+        else
+        {
+            listeningEvent = (EventT)Activator.CreateInstance(typeof(EventT));
+            events.Add(typeof(EventT), listeningEvent);
+        }
+        listeningEvent.AddListener(action);
+    }
+    #endregion
+
     #region Removing Listeners
-    public void RemoveListener(string name, UnityAction action)
+    
+    public void RemoveListener<EventT>(UnityAction action) where EventT : UnityEvent
     {
-        if (events.ContainsKey(name))
+        if (events.ContainsKey(typeof(EventT)))
         {
-            UnityEvent listeningEvent = (UnityEvent)events[name];
+            UnityEvent listeningEvent = (UnityEvent)events[typeof(EventT)];
             listeningEvent.RemoveListener(action);
         }
     }
-    public void RemoveListener<T0>(string name, UnityAction<T0> action)
+    public void RemoveListener<EventT, T0>(UnityAction<T0> action) where EventT : UnityEvent<T0>
     {
-        if (events.ContainsKey(name))
+        if (events.ContainsKey(typeof(EventT)))
         {
-            UnityEvent<T0> listeningEvent = (UnityEvent<T0>)events[name];
+            UnityEvent<T0> listeningEvent = (UnityEvent<T0>)events[typeof(EventT)];
             listeningEvent.RemoveListener(action);
         }
     }
-    public void RemoveListener<T0, T1>(string name, UnityAction<T0, T1> action)
+    public void RemoveListener<EventT, T0, T1>(UnityAction<T0, T1> action) where EventT : UnityEvent<T0, T1>
     {
-        if (events.ContainsKey(name))
+        if (events.ContainsKey(typeof(EventT)))
         {
-            UnityEvent<T0, T1> listeningEvent = (UnityEvent<T0, T1>)events[name];
+            UnityEvent<T0, T1> listeningEvent = (UnityEvent<T0, T1>)events[typeof(EventT)];
             listeningEvent.RemoveListener(action);
         }
     }
-    public void RemoveListener<T0, T1, T2>(string name, UnityAction<T0, T1, T2> action)
+    public void RemoveListener<EventT, T0, T1, T2>(UnityAction<T0, T1, T2> action) where EventT : UnityEvent<T0, T1, T2>
     {
-        if (events.ContainsKey(name))
+        if (events.ContainsKey(typeof(EventT)))
         {
-            UnityEvent<T0, T1, T2> listeningEvent = (UnityEvent<T0, T1, T2>)events[name];
+            UnityEvent<T0, T1, T2> listeningEvent = (UnityEvent<T0, T1, T2>)events[typeof(EventT)];
             listeningEvent.RemoveListener(action);
         }
     }
-    public void RemoveListener<T0, T1, T2, T3>(string name, UnityAction<T0, T1, T2, T3> action)
+    public void RemoveListener<EventT, T0, T1, T2, T3>(UnityAction<T0, T1, T2, T3> action) where EventT : UnityEvent<T0, T1, T2, T3>
     {
-        if (events.ContainsKey(name))
+        if (events.ContainsKey(typeof(EventT)))
         {
-            UnityEvent<T0, T1, T2, T3> listeningEvent = (UnityEvent<T0, T1, T2, T3>)events[name];
+            UnityEvent<T0, T1, T2, T3> listeningEvent = (UnityEvent<T0, T1, T2, T3>)events[typeof(EventT)];
             listeningEvent.RemoveListener(action);
         }
     }

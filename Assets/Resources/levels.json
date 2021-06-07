@@ -3,9 +3,9 @@
     {
       "number": 1,
       "path": [22,32],
-	  "maxY": 32,
-	  "maxX": 24,
-	  "specialTiles" :
+	  "maxX": 32,
+	  "maxY": 24,
+	  "tileBlockData" :
 	  [
 		  {
 			"rootLocation":
@@ -18,7 +18,8 @@
 				"x":3,
 				"y":3
 			},
-			"tileType":""
+			"tileType":"Sprites/Tilemaps/Flat/grass-flat-01",
+			"canTraverse":false
 		  }
 	  ]
     },
