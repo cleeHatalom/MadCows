@@ -2,6 +2,11 @@
   "levels": [
     {
       "number": 1,
+      "characterSpawnPoint":
+			{
+				"x":16,
+				"y":12
+			},
       "path": [22,32],
 	  "maxX": 32,
 	  "maxY": 24,

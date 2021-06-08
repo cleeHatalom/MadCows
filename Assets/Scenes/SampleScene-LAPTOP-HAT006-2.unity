@@ -1658,7 +1658,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.01006192, y: -0.20123997}
+  m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -1669,7 +1669,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.7848362, y: 1.5232241}
+  m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
 --- !u!212 &196401139
 SpriteRenderer:
@@ -1709,8 +1709,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: -552584077
-  m_SortingLayer: 0
+  m_SortingLayerID: 394321741
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: daeb6b7376e5ed646852e5f9d12c9d3e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -1730,12 +1730,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 196401136}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -2.4847407, y: 1.6850007, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &196401141
 Animator:
@@ -1770,6 +1770,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shouldFollow: 0
   targetLoc: {x: 0, y: 0, z: 0}
+  previousLoc: {x: 0, y: 0, z: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -9952,7 +9953,7 @@ Transform:
   m_Children:
   - {fileID: 754029038}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1285287934
 GameObject:
@@ -11560,8 +11561,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 374502097
-  m_SortingLayer: 0
+  m_SortingLayerID: -1388091759
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 5df8f1bf0be6aa34a855676391e6909e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -11582,7 +11583,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1915556506}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6.5, y: 3.19, z: 0}
+  m_LocalPosition: {x: 1.38, y: 2.35, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_Children: []
   m_Father: {fileID: 0}

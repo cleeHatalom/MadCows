@@ -39,7 +39,7 @@ public abstract class BaseEventArgs<EventT, ParamT0, ParamT1, ParamT2, ParamT3> 
 #endregion
 
 
-public class EventHub
+public class EventHub : IDisposable
 {
     private Dictionary<Type, UnityEventBase> events = new Dictionary<Type, UnityEventBase>();
 
@@ -240,6 +240,15 @@ public class EventHub
             UnityEvent<T0, T1, T2, T3> listeningEvent = (UnityEvent<T0, T1, T2, T3>)events[typeof(EventT)];
             listeningEvent.RemoveListener(action);
         }
+    }
+
+    public void Dispose()
+    {
+        foreach(UnityEventBase ueb in events.Values)
+        {
+            ueb.RemoveAllListeners();
+        }
+        events.Clear();
     }
     #endregion
 }

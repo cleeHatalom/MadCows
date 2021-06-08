@@ -20,19 +20,12 @@ namespace EventDefinitions
 
     public class MapTargetSetEventArgs : BaseEventArgs<MapTargetSetEvent, Vector2> { }
 
-    public class SpawnCharacterEvent : UnityEvent<Vector2Int> { }
+    public class SpawnCharacterEvent : UnityEvent<Vector3> { }
 
-    public class SpawnCharacterEventArgs : BaseEventArgs<SpawnCharacterEvent, Vector2Int> { }
+    public class SpawnCharacterEventArgs : BaseEventArgs<SpawnCharacterEvent, Vector3> { }
 
-    public class PollCharacterPositionEvent : UnityEvent<string> { }
-
-    public class PollCharacterPositionEventArgs : BaseEventArgs<PollCharacterPositionEvent, string> { }
-
-    public class BroadcastCharacterPositionEvent : UnityEvent<Vector2Int> { }
-
-    public class BroadcastCharacterPositionEventArgs : BaseEventArgs<BroadcastCharacterPositionEvent, Vector2Int> { }
-
-    public class SetCharacterPathEvent : UnityEvent<string, List<Vector2Int>> { }
+    public class SetCharacterPathEvent : UnityEvent<string, Vector2> { }
+    public class SetCharacterPathEventArgs : BaseEventArgs<SetCharacterPathEvent, string, Vector2> { }
 
     public class OnCharacterClickedEvent : UnityEvent<string> { }
 

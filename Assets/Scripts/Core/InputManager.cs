@@ -86,18 +86,24 @@ public class InputManager : MonoBehaviour
                 RaycastHit2D hit = hits[0];
                 if (hit.collider != null)
                 {
-                    //Debug.Log(hit.collider.gameObject);
+                    Debug.Log(hit.collider.gameObject);
                     if (hit.collider.gameObject.GetComponent<TestCharacter>())
                     {
-                        OnCharacterSelectedEventArgs args = new OnCharacterSelectedEventArgs();
+                        OnCharacterClickedEventArgs args = new OnCharacterClickedEventArgs();
                         args.param0 = hit.collider.gameObject.name;
 
                         PersistentGameManager.Instance.EventHub.RaiseEvent(args);
                     }
                     else if (hit.collider.gameObject.GetComponent<TilemapCollider2D>())
                     {
+                        var grid = hit.collider.gameObject.GetComponentInParent<GridLayout>();
+
+                        //var gridPos = grid.GetCellCenterWorld(new Vector3Int((int)hit.collider.ClosestPoint(pos).x, (int)hit.collider.ClosestPoint(pos).y, 0));
+                        var gridPos = grid.WorldToCell(new Vector3(hit.collider.ClosestPoint(pos).x, hit.collider.ClosestPoint(pos).y, 0));
+
                         OnScreenClickedEventArgs args = new OnScreenClickedEventArgs();
                         args.param0 = hit.collider.ClosestPoint(pos);
+                        Debug.Log(hit.collider.ClosestPoint(pos) + "=>" + gridPos);
 
                         PersistentGameManager.Instance.EventHub.RaiseEvent(args);
                     }

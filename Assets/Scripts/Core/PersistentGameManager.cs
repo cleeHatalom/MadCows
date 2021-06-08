@@ -31,7 +31,7 @@ public class PersistentGameManager : GenericSingletonMonobehaviour<PersistentGam
         {
             if(_levelManager == null)
             {
-                _levelManager = gameObject.AddComponent<LevelManager>();
+                _levelManager = new LevelManager();
             }
 
             return _levelManager;
@@ -44,12 +44,18 @@ public class PersistentGameManager : GenericSingletonMonobehaviour<PersistentGam
         // for the future: Use a coroutine to load stuff like the levels.
 
         LevelManager.ReadLevelsData();
+
         LevelManager.DispatchLoadLevelEvent(1);
     }
 
-    // Update is called once per frame
-    void Update()
+    public override void OnDestroy()
     {
-        
+        if (_eventHub != null)
+        {
+            _eventHub.Dispose();
+        }
+        _eventHub = null;
+        _levelManager = null;
+        base.OnDestroy();
     }
 }

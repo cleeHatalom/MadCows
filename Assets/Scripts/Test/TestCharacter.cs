@@ -21,19 +21,24 @@ public class TestCharacter : MonoBehaviour
     void Start()
     {
         PersistentGameManager.Instance.EventHub.AddListener<OnCharacterClickedEvent, string>(HandleCharacterClicked);
-        PersistentGameManager.Instance.EventHub.AddListener<PollCharacterPositionEvent, string>(BroadcastLocation);
-        //PersistentGameManager.Instance.EventHub.AddListener<Vector2>("MapTargetSet", TrackNewLocation);
+        PersistentGameManager.Instance.EventHub.AddListener<MapTargetSetEvent, Vector2>(TrackNewLocation);
+        PersistentGameManager.Instance.EventHub.AddListener<SpawnCharacterEvent, Vector3>(SpawnCharacter);
         animator = GetComponent<Animator>();
         shouldFollow = false;
     }
+    private void SpawnCharacter(Vector3 startPos)
+    {
+        transform.position = targetLoc = previousLoc = startPos;
+        Debug.Log("Go here: " + transform.position);
 
+    }
     public void HandleCharacterClicked(string name)
     {
         if(name == this.name)
         {
             Debug.Log("Clicked on " + name);
             shouldFollow = !shouldFollow;
-
+            /*
             OnCharacterSelectedEventArgs args = new OnCharacterSelectedEventArgs();
             if (shouldFollow)
             {
@@ -44,30 +49,28 @@ public class TestCharacter : MonoBehaviour
                 args.param0 = "";
             }
             PersistentGameManager.Instance.EventHub.RaiseEvent(args);
+            */
             animator.SetBool("IsActive", shouldFollow);
         }
     }
-    public void BroadcastLocation(string name)
-    {
-        if(name == this.name)
-        {
-            BroadcastCharacterPositionEventArgs args = new BroadcastCharacterPositionEventArgs();
-            args.param0 = new Vector2Int((int)previousLoc.x, (int)previousLoc.y) ;
-        }
-    }
-
     public void TrackNewLocation(Vector2 newLoc)
     {
         previousLoc = targetLoc;
         targetLoc = new Vector3(newLoc.x, newLoc.y, 0);
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
         if(shouldFollow)
         {
-            transform.position = Vector3.Lerp(transform.position, targetLoc, 2*Time.deltaTime);
+            StartCoroutine(WalkPath());
+        }
+    }
+
+    public IEnumerator WalkPath()
+    {
+        //var graph = PersistentGameManager.Instance.LevelManager.GetNavData();
+        while ((targetLoc-transform.position).sqrMagnitude > 0.1f)
+        {
+            transform.position = Vector3.Lerp(transform.position, targetLoc, 2*Time.fixedDeltaTime); // Move objectToMove closer to b
+            yield return new WaitForFixedUpdate();         // Leave the routine and return here in the next frame
         }
     }
 }
